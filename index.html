@@ -102,8 +102,8 @@
 
     function GetQueryString(name) {
         let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-		let r = window.location.search.substr(1).match(reg); //获取url中"?"符后的字符串并正则匹配
-		let context = "";
+        let r = window.location.search.substr(1).match(reg); //获取url中"?"符后的字符串并正则匹配
+        let context = "";
 
         if (r != null)
             context = r[2];
@@ -128,6 +128,11 @@
     let clockElm = document.getElementById('clock')
 
     function formatTime(time) {
+        let isNegative = false
+        if (time < 0) {
+            time = -time
+            isNegative = true
+        }
         let h = Math.floor(time / 3600000)
         let m = Math.floor((time - (h * 3600000)) / 60000)
         let s = Math.floor((time / 1000) % 60)
@@ -135,7 +140,7 @@
         let hh = h.toString().padStart(2, '0')
         let mm = m.toString().padStart(2, '0')
         let ss = s.toString().padStart(2, '0')
-        return `${hh}:${mm}:${ss}`;
+        return `${isNegative ? '-' : ''}${hh}:${mm}:${ss}`;
     }
 
     setInterval(() => {

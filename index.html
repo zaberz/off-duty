@@ -1,85 +1,97 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
 
-	<title>下班！</title>
-	<style type="text/css">
-		*{
-			margin: 0;
-		}
-		html, body{
-			position: relative;
-			width: 100%;
-			height: 100%;
-			overflow: hidden;
-		}
-		.font-wrap{
-			position: relative;
-			z-index: 2;
-			color: #fff;
-			width: 100%;
-			height: 100%;
-			pointer-events: none;
+    <title>下班！</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+        }
 
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-		}
-		.bg{
-			position:absolute;
-			width:100%;
-			height: 100%;
-			z-index:1;
-		}
-		.text{}
-		.time{
-			font-size: 15vw;
-		}
-		.btn-fullscreen{
-			position: absolute;
-			width: 10vw;
-			bottom: 10px;
-			right: 10px;
-			opacity: 0.1
-		}
-		.btn-fullscreen:hover{
-			opacity: 0.9
-		}
+        html, body {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
 
-		.clock{
-			display: inline-block;
-			width: 60vw;
-		}
-		.mill{
-			display: inline-block;
-			width: 30vw;
-		}
-	</style>
+        .font-wrap {
+            position: relative;
+            z-index: 2;
+            color: #fff;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .text {
+        }
+
+        .time {
+            font-size: 15vw;
+        }
+
+        .btn-fullscreen {
+            position: absolute;
+            width: 10vw;
+            bottom: 10px;
+            right: 10px;
+            opacity: 0.1
+        }
+
+        .btn-fullscreen:hover {
+            opacity: 0.9
+        }
+
+        .clock {
+            display: inline-block;
+            width: 60vw;
+        }
+
+        .mill {
+            display: inline-block;
+            width: 30vw;
+        }
+    </style>
 </head>
 <body>
 <!-- <div>距离老子下班还有</div> -->
 
 
-
 <canvas style="position:absolute; width:100%;height: 100%"></canvas>
 <div class="font-wrap">
-	<p class="text">距离老子下班还有：</p>
-	<p class="time">
-		<span id="clock" class="clock">00:00:00</span>
-		<span id="mill" class="mill">999</span>
-	</p>
-	<!-- <p id="mill"></p> -->
+    <p class="text">距离老子下班还有：</p>
+    <p class="time">
+        <span id="clock" class="clock">00:00:00</span>
+        <span id="mill" class="mill">999</span>
+    </p>
+    <!-- <p id="mill"></p> -->
 </div>
 
 
 <img src="./full-screen.svg" id="fullscreen" class="btn-fullscreen">
-<div id="fullscreen" style="">quanping</div>
 <script>
-    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+    window.ga = window.ga || function () {
+        (ga.q = ga.q || []).push(arguments)
+    };
+    ga.l = +new Date;
 </script>
 <!-- <script async src='https://www.google-analytics.com/analytics.js'></script> -->
 
@@ -87,99 +99,125 @@
 <script type="text/javascript" src="anime.min.js"></script>
 <script type="text/javascript" src="./script.js"></script>
 <script type="text/javascript">
-	let now = +new Date()
-	now = Math.floor(now / 1000) * 1000
 
-	let today = (new Date()).toDateString()
-	let xbTime = +new Date(today+ ' 17:30:00')
+    function GetQueryString(name) {
+        let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+		let r = window.location.search.substr(1).match(reg); //获取url中"?"符后的字符串并正则匹配
+		let context = "";
 
-	let remain = xbTime - now
+        if (r != null)
+            context = r[2];
+        reg = null;
+        r = null;
+        return context == null || context == "" || context == "undefined" ? "" : context;
+    }
 
-	let clockElm = document.getElementById('clock')
+    console.log(GetQueryString("t"));
 
-	function formatTime(time) {
-		let h = Math.floor(time /3600000)
-		let m = Math.floor((time -(h * 3600000)) / 60000)
-		let s = Math.floor( (time /1000)% 60 )
-
-		let hh = h.toString().padStart(2, '0')
-		let mm = m.toString().padStart(2, '0')
-		let ss = s.toString().padStart(2, '0')
-		return `${hh}:${mm}:${ss}`;
-	}
-
-	setInterval(()=> {
-		startSecond()
-	}, 1000)
+    let customTime = decodeURIComponent(GetQueryString("t")) || '17:30:00';
 
 
-	function startMill() {
-		let millSecondElm = document.getElementById('mill');
-		let mill = {time: 999};
-		anime({
-			targets: mill,
-			time: 0,
-			round: 1,
-			easing: 'linear',
-			duration: 1000,
-			loop: true,
-			update: function() {
-				let mtile = mill.time.toString()
-				let res = mtile.padStart(3, '0')
-				millSecondElm.innerHTML = res;
-			}
-		});
-	}
-	function startSecond() {
-		remain -= 1000
-		let a = formatTime(remain)
-		clock.innerText = a
-	}
-	startSecond()
-	startMill()
+    let now = +new Date()
+    now = Math.floor(now / 1000) * 1000
 
-	window.onload = function() {
-		openFullscreen(document.documentElement)
-	}
+    let today = (new Date()).toDateString()
+    let xbTime = +new Date(today + ' ' + customTime)
+
+    let remain = xbTime - now
+
+    let clockElm = document.getElementById('clock')
+
+    function formatTime(time) {
+        let h = Math.floor(time / 3600000)
+        let m = Math.floor((time - (h * 3600000)) / 60000)
+        let s = Math.floor((time / 1000) % 60)
+
+        let hh = h.toString().padStart(2, '0')
+        let mm = m.toString().padStart(2, '0')
+        let ss = s.toString().padStart(2, '0')
+        return `${hh}:${mm}:${ss}`;
+    }
+
+    setInterval(() => {
+        startSecond()
+    }, 1000)
 
 
-	document.getElementById('fullscreen').addEventListener('click', function(){
-		// document.documentElement.requestFullscreen()
-		if (!isFullScreen()) {
-			openFullscreen(document.documentElement)
-		}else{
-			closeFullscreen(document.documentElement)
-		}
+    function startMill() {
+        let millSecondElm = document.getElementById('mill');
+        let mill = {time: 999};
+        anime({
+            targets: mill,
+            time: 0,
+            round: 1,
+            easing: 'linear',
+            duration: 1000,
+            loop: true,
+            update: function () {
+                let mtile = mill.time.toString()
+                let res = mtile.padStart(3, '0')
+                millSecondElm.innerHTML = res;
+            }
+        });
+    }
 
-	})
+    function startSecond() {
+        remain -= 1000
+        let a = formatTime(remain)
+        clockElm.innerText = a
+    }
 
-	function openFullscreen(elem) {
-	  if (elem.requestFullscreen) {
-	    elem.requestFullscreen();
-	  } else if (elem.mozRequestFullScreen) { /* Firefox */
-	    elem.mozRequestFullScreen();
-	  } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-	    elem.webkitRequestFullscreen();
-	  } else if (elem.msRequestFullscreen) { /* IE/Edge */
-	    elem.msRequestFullscreen();
-	  }
-	}
+    startSecond()
+    startMill()
 
-	/* Close fullscreen */
-	function closeFullscreen() {
-	  if (document.exitFullscreen) {
-	    document.exitFullscreen();
-	  } else if (document.mozCancelFullScreen) { /* Firefox */
-	    document.mozCancelFullScreen();
-	  } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
-	    document.webkitExitFullscreen();
-	  } else if (document.msExitFullscreen) { /* IE/Edge */
-	    document.msExitFullscreen();
-	  }
-	}
-	function isFullScreen () {
-    	return document.isFullScreen || document.mozIsFullScreen || document.webkitIsFullScreen
-	}
+    window.onload = function () {
+        try {
+            openFullscreen(document.documentElement)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+
+    document.getElementById('fullscreen').addEventListener('click', function () {
+        // document.documentElement.requestFullscreen()
+        if (!isFullScreen()) {
+            openFullscreen(document.documentElement)
+        } else {
+            closeFullscreen(document.documentElement)
+        }
+
+    })
+
+    function openFullscreen(elem) {
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) { /* Firefox */
+            elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) { /* IE/Edge */
+            elem.msRequestFullscreen();
+        }
+
+    }
+
+    /* Close fullscreen */
+    function closeFullscreen() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { /* Firefox */
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { /* IE/Edge */
+            document.msExitFullscreen();
+        }
+    }
+
+    function isFullScreen() {
+        return document.isFullScreen || document.mozIsFullScreen || document.webkitIsFullScreen
+    }
 </script>
 </body>
 </html>

@@ -18,6 +18,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+            background: #000;
         }
 
         .font-wrap {
@@ -45,7 +46,7 @@
         }
 
         .time {
-            font-size: 15vw;
+            font-size: 13vw;
         }
 
         .btn-fullscreen {
@@ -58,6 +59,17 @@
 
         .btn-fullscreen:hover {
             opacity: 0.9
+        }
+        .btn-more{
+            position: absolute;
+            width: 10vw;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 10px;
+            opacity: 0.1
+        }
+        .btn-more:hover{
+            opacity: 0.9;
         }
 
         .clock {
@@ -97,7 +109,7 @@
     <!-- <p id="mill"></p> -->
 </div>
 
-
+<img src="./arrow-right.svg?1" alt="" id="more" class="btn-more">
 <img src="./full-screen.svg" id="fullscreen" class="btn-fullscreen">
 <script>
     window.ga = window.ga || function () {
@@ -109,7 +121,7 @@
 
 <script type="text/javascript" src="./lib.js"></script>
 <script type="text/javascript" src="anime.min.js"></script>
-<script type="text/javascript" src="./script.js"></script>
+<!--<script type="text/javascript" src="./script.js"></script>-->
 <script type="text/javascript">
 
     function GetQueryString(name) {
@@ -124,7 +136,6 @@
         return context == null || context == "" || context == "undefined" ? "" : context;
     }
 
-    console.log(GetQueryString("t"));
 
     let customTime = decodeURIComponent(GetQueryString("t")) || '17:30:00';
 
@@ -188,11 +199,7 @@
     startMill()
 
     window.onload = function () {
-        try {
-            openFullscreen(document.documentElement)
-        } catch (e) {
-            console.log(e)
-        }
+
     }
 
 
@@ -204,6 +211,9 @@
             closeFullscreen(document.documentElement)
         }
 
+    })
+    document.getElementById('more').addEventListener('click', function () {
+        location.href = 'a.html'
     })
 
     function openFullscreen(elem) {
